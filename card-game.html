@@ -16,85 +16,110 @@
             background: #ffffff;
             color: #000000;
             min-height: 100vh;
-            display: flex;
-            flex-direction: column;
         }
 
-        .game-container {
-            max-width: 1200px;
+        .game-wrapper {
+            display: flex;
+            max-width: 1400px;
             margin: 0 auto;
-            padding: 20px;
-            flex: 1;
+            padding: 16px;
+            gap: 16px;
+        }
+
+        .main-content {
+            flex-grow: 1;
             display: flex;
             flex-direction: column;
+            gap: 16px;
+        }
+
+        .sidebar {
+            width: 320px;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            border: 2px solid #000;
+            padding: 16px;
+            background: #f2f2f2; /* Lighter gray for sidebar */
+        }
+
+        .sidebar-title {
+            font-size: 20px;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 8px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 4px;
         }
 
         .header {
             text-align: center;
             border: 2px solid #000000;
-            padding: 10px;
-            margin-bottom: 20px;
-            background: #f0f0f0;
+            padding: 8px;
+            background: #e5e5e5;
         }
 
         .game-board {
             flex: 1;
             display: grid;
             grid-template-rows: auto 1fr auto;
-            gap: 20px;
+            gap: 16px;
             border: 2px solid #000000;
-            padding: 20px;
+            padding: 16px;
         }
 
         .computer-zone, .player-zone {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
         }
 
         .hp-display {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: bold;
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid #000000;
-            background: #f5f5f5;
+            background: #ffffff;
             min-width: 150px;
             text-align: center;
         }
 
         .field-area {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             flex-wrap: wrap;
-            min-height: 120px;
-            border: 1px dashed #666666;
-            padding: 10px;
+            min-height: 160px; /* Adjusted for new card size */
+            border: 1px dashed #808080;
+            padding: 8px;
             align-items: center;
             justify-content: center;
+            flex-grow: 1;
         }
 
         .card {
-            width: 100px;
-            height: 140px;
+            width: 120px;
+            height: 160px;
             border: 2px solid #000000;
             background: #ffffff;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 5px;
+            padding: 4px;
             cursor: pointer;
-            transition: transform 0.2s;
-            font-size: 10px;
+            transition: transform 0.2s, background-color 0.2s;
+            font-size: 12px;
         }
 
         .card:hover {
             transform: scale(1.05);
-            background: #f8f8f8;
+            background: #e5e5e5;
         }
 
         .card.selected {
-            background: #e0e0e0;
-            border-color: #333333;
+            background: #b3b3b3;
+            border-color: #000;
         }
 
         .card.defense {
@@ -107,6 +132,7 @@
             border-bottom: 1px solid #000000;
             padding-bottom: 2px;
             margin-bottom: 2px;
+            font-size: 14px;
         }
 
         .card-stats {
@@ -115,7 +141,7 @@
         }
 
         .card-position {
-            font-size: 8px;
+            font-size: 10px;
             text-align: center;
             margin: 2px 0;
             font-weight: bold;
@@ -123,74 +149,76 @@
 
         .hand-area {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             justify-content: center;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #000000;
-            background: #f8f8f8;
+            background: #e5e5e5;
+            min-height: 180px; /* Adjusted for new card size */
         }
 
         .battle-field {
             text-align: center;
-            padding: 20px;
+            padding: 16px;
             border: 2px solid #000000;
-            background: #f0f0f0;
+            background: #e5e5e5;
             min-height: 100px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
-        .controls {
+        .controls-group {
             display: flex;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px 0;
+            flex-direction: column;
+            gap: 8px;
         }
 
         .btn {
-            padding: 10px 20px;
+            padding: 8px 16px;
             border: 2px solid #000000;
             background: #ffffff;
             color: #000000;
             font-family: 'Courier New', monospace;
-            font-size: 14px;
+            font-size: 16px;
             cursor: pointer;
             transition: background-color 0.2s;
+            text-align: center;
         }
 
         .btn:hover {
-            background: #e0e0e0;
+            background: #b3b3b3;
         }
 
         .btn:disabled {
-            background: #cccccc;
+            background: #cccccc; /* Kept one for disabled state */
             cursor: not-allowed;
-            color: #666666;
+            color: #808080;
         }
 
         .turn-indicator {
             text-align: center;
             font-size: 18px;
             font-weight: bold;
-            padding: 10px;
+            padding: 8px;
             border: 1px solid #000000;
-            margin-bottom: 10px;
         }
 
         .history-section {
-            margin-top: 20px;
             border: 2px solid #000000;
-            background: #f8f8f8;
+            background: #ffffff;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .history-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 10px 15px;
-            background: #e0e0e0;
-            border-bottom: 1px solid #000000;
+            padding: 8px;
+            background: #b3b3b3;
+            border-bottom: 2px solid #000000;
         }
 
         .history-header h3 {
@@ -200,21 +228,21 @@
 
         .history-stats {
             display: flex;
-            gap: 15px;
+            gap: 16px;
             font-size: 12px;
             font-weight: bold;
         }
 
         .game-log {
-            height: 150px;
+            flex-grow: 1;
             background: #ffffff;
-            padding: 10px;
+            padding: 8px;
             overflow-y: auto;
             font-size: 11px;
         }
 
         .log-entry {
-            padding: 3px 0;
+            padding: 2px 0;
             border-bottom: 1px dotted #cccccc;
             margin-bottom: 2px;
         }
@@ -225,41 +253,41 @@
 
         .log-entry.turn-start {
             font-weight: bold;
-            background: #f0f0f0;
-            padding: 5px;
-            margin: 5px 0;
+            background: #e5e5e5;
+            padding: 4px;
+            margin: 4px 0;
         }
 
         .log-entry.card-action {
-            color: #333333;
-            padding-left: 10px;
+            color: #4d4d4d;
+            padding-left: 8px;
         }
 
         .log-entry.battle-action {
             color: #000000;
             font-weight: bold;
-            padding-left: 10px;
+            padding-left: 8px;
         }
 
         .log-entry.damage-action {
-            color: #444444;
+            color: #000000;
             font-weight: bold;
-            background: #f5f5f5;
-            padding: 3px 5px;
+            background: #b3b3b3;
+            padding: 2px 4px;
         }
 
         .log-entry.game-event {
             font-weight: bold;
             text-align: center;
-            background: #eeeeee;
-            padding: 5px;
-            margin: 5px 0;
+            background: #e5e5e5;
+            padding: 4px;
+            margin: 4px 0;
         }
 
         .log-entry.welcome {
             font-style: italic;
             text-align: center;
-            color: #666666;
+            color: #808080;
         }
 
         .modal {
@@ -278,43 +306,46 @@
         .modal-content {
             background: #ffffff;
             border: 3px solid #000000;
-            padding: 40px;
+            padding: 32px;
             text-align: center;
             max-width: 400px;
         }
 
         .modal h2 {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             font-size: 24px;
         }
 
-        .computer-label {
-            background: #e0e0e0;
+        .computer-label, .player-label {
+            background: #b3b3b3;
             border: 1px solid #000000;
-            padding: 5px 10px;
+            padding: 4px 8px;
             font-weight: bold;
         }
 
-        .player-label {
-            background: #d0d0d0;
-            border: 1px solid #000000;
-            padding: 5px 10px;
-            font-weight: bold;
+        @media (max-width: 1200px) {
+            .game-wrapper {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            .controls-group, .history-section {
+                flex-basis: 300px;
+                flex-grow: 1;
+            }
         }
 
         @media (max-width: 768px) {
-            .game-container {
-                padding: 10px;
+            .sidebar {
+                flex-direction: column;
             }
-            
             .card {
                 width: 80px;
                 height: 112px;
                 font-size: 9px;
-            }
-            
-            .controls {
-                flex-wrap: wrap;
             }
             
             .btn {
@@ -325,71 +356,76 @@
     </style>
 </head>
 <body>
-    <div class="game-container">
-        <div class="header">
-            <h1>YU-GI-OH INSPIRED CARD GAME</h1>
-        </div>
+    <div class="game-wrapper">
+        <main class="main-content">
+            <div class="header">
+                <h1>YU-GI-OH INSPIRED CARD GAME</h1>
+            </div>
 
-        <div class="turn-indicator" id="turnIndicator">
-            PLAYER TURN - Draw your card!
-        </div>
+            <div class="turn-indicator" id="turnIndicator">
+                PLAYER TURN - Draw your card!
+            </div>
 
-        <div class="game-board">
-            <!-- Computer Zone -->
-            <div class="computer-zone">
-                <div class="computer-label">COMPUTER</div>
-                <div class="hp-display" id="computerHP">HP: 8000</div>
-                <div class="field-area" id="computerField">
-                    <!-- Computer cards will appear here -->
+            <div class="game-board">
+                <!-- Computer Zone -->
+                <div class="computer-zone">
+                    <div class="computer-label">COMPUTER</div>
+                    <div class="hp-display" id="computerHP">HP: 8000</div>
+                    <div class="field-area" id="computerField">
+                        <!-- Computer cards will appear here -->
+                    </div>
+                </div>
+
+                <!-- Battle Field -->
+                <div class="battle-field" id="battleField">
+                    BATTLE FIELD - Cards will fight here
+                </div>
+
+                <!-- Player Zone -->
+                <div class="player-zone">
+                    <div class="player-label">PLAYER</div>
+                    <div class="hp-display" id="playerHP">HP: 8000</div>
+                    <div class="field-area" id="playerField">
+                        <!-- Player cards will appear here -->
+                    </div>
                 </div>
             </div>
 
-            <!-- Battle Field -->
-            <div class="battle-field" id="battleField">
-                BATTLE FIELD - Cards will fight here
+            <!-- Player Hand -->
+            <div class="hand-area" id="playerHand">
+                <!-- Player's current card will appear here -->
+            </div>
+        </main>
+        <aside class="sidebar">
+             <div class="controls-group">
+                <h2 class="sidebar-title">CONTROLS</h2>
+                <button class="btn" id="drawCardBtn" onclick="drawCard()">DRAW CARD</button>
+                <button class="btn" id="attackPositionBtn" onclick="playCard('attack')" disabled>ATTACK</button>
+                <button class="btn" id="defensePositionBtn" onclick="playCard('defense')" disabled>DEFENSE</button>
+                <button class="btn" id="battleBtn" onclick="startBattle()" disabled>BATTLE</button>
+                <button class="btn" id="endTurnBtn" onclick="endTurn()" disabled>END TURN</button>
             </div>
 
-            <!-- Player Zone -->
-            <div class="player-zone">
-                <div class="player-label">PLAYER</div>
-                <div class="hp-display" id="playerHP">HP: 8000</div>
-                <div class="field-area" id="playerField">
-                    <!-- Player cards will appear here -->
+            <div class="controls-group">
+                <h2 class="sidebar-title">GAME</h2>
+                <button class="btn" onclick="resetGame()">NEW GAME</button>
+                <button class="btn" onclick="showRules()">RULES</button>
+                <button class="btn" onclick="clearHistory()">CLEAR LOG</button>
+            </div>
+
+            <div class="history-section">
+                <div class="history-header">
+                    <h3>GAME LOG</h3>
+                    <div class="history-stats">
+                        <span id="turnCounter">Turn: 1</span>
+                        <span id="actionCounter">Actions: 0</span>
+                    </div>
+                </div>
+                <div class="game-log" id="gameLog">
+                    <div class="log-entry welcome">Welcome! Draw a card to start.</div>
                 </div>
             </div>
-        </div>
-
-        <!-- Player Hand -->
-        <div class="hand-area" id="playerHand">
-            <!-- Player's current card will appear here -->
-        </div>
-
-        <div class="controls">
-            <button class="btn" id="drawCardBtn" onclick="drawCard()">DRAW CARD</button>
-            <button class="btn" id="attackPositionBtn" onclick="playCard('attack')" disabled>ATTACK POSITION</button>
-            <button class="btn" id="defensePositionBtn" onclick="playCard('defense')" disabled>DEFENSE POSITION</button>
-            <button class="btn" id="battleBtn" onclick="startBattle()" disabled>BATTLE PHASE</button>
-            <button class="btn" id="endTurnBtn" onclick="endTurn()" disabled>END TURN</button>
-        </div>
-
-        <div class="controls">
-            <button class="btn" onclick="resetGame()">NEW GAME</button>
-            <button class="btn" onclick="showRules()">RULES</button>
-            <button class="btn" onclick="clearHistory()">CLEAR HISTORY</button>
-        </div>
-
-        <div class="history-section">
-            <div class="history-header">
-                <h3>GAME HISTORY</h3>
-                <div class="history-stats">
-                    <span id="turnCounter">Turn: 1</span>
-                    <span id="actionCounter">Actions: 0</span>
-                </div>
-            </div>
-            <div class="game-log" id="gameLog">
-                <div class="log-entry welcome">Welcome to the Card Game! Click DRAW CARD to start.</div>
-            </div>
-        </div>
+        </aside>
     </div>
 
     <!-- Game Over Modal -->
@@ -597,49 +633,72 @@
         function battleCards(attacker) {
             const attackerField = attacker === 'player' ? gameState.playerField : gameState.computerField;
             const defenderField = attacker === 'player' ? gameState.computerField : gameState.playerField;
-            
-            const attackingCard = attackerField.find(card => card.position === 'attack');
-            if (!attackingCard) return;
-            
-            // Find target (weakest defending card that can be defeated, or same attack for mutual destruction)
-            let target = null;
-            
-            for (let card of defenderField) {
-                const defenderValue = card.position === 'attack' ? card.attack : card.defense;
-                const attackerValue = attackingCard.attack;
-                
-                if (attackerValue > defenderValue) {
-                    if (!target || defenderValue > (target.position === 'attack' ? target.attack : target.defense)) {
-                        target = card;
-                    }
-                } else if (attackerValue === defenderValue) {
-                    target = card;
-                    break; // Prefer equal attack for mutual destruction
-                }
+            const attackingPlayer = attacker;
+            const defendingPlayer = attacker === 'player' ? 'computer' : 'player';
+
+            const attackingCard = attackerField.find(c => c.position === 'attack');
+            if (!attackingCard) {
+                logMessage(`${attackingPlayer.charAt(0).toUpperCase() + attackingPlayer.slice(1)} has no monster in attack position.`, 'battle-action');
+                return;
             }
-            
-            if (target) {
-                const defenderValue = target.position === 'attack' ? target.attack : target.defense;
-                const attackerValue = attackingCard.attack;
-                
-                logMessage(`${attackingCard.name} (${attackerValue}) attacks ${target.name} (${defenderValue})`, 'battle-action');
-                
-                if (attackerValue > defenderValue) {
-                    // Attacker wins
-                    defenderField.splice(defenderField.indexOf(target), 1);
-                    logMessage(`${target.name} is destroyed!`, 'battle-action');
-                } else if (attackerValue === defenderValue) {
-                    // Mutual destruction
+
+            // For now, computer AI will attack the first available target.
+            // A more sophisticated AI could be implemented here.
+            const targetCard = defenderField[0];
+
+            if (!targetCard) {
+                // This case is handled in playerBattle/computerBattle, but as a fallback:
+                logMessage(`No monsters to attack.`, 'battle-action');
+                return;
+            }
+
+            logMessage(`${attackingPlayer.charAt(0).toUpperCase() + attackingPlayer.slice(1)}'s ${attackingCard.name} (ATK: ${attackingCard.attack}) attacks ${targetCard.name} (ATK: ${targetCard.attack}, DEF: ${targetCard.defense}) in ${targetCard.position} position.`, 'battle-action');
+
+            if (targetCard.position === 'attack') {
+                if (attackingCard.attack > targetCard.attack) {
+                    const damage = attackingCard.attack - targetCard.attack;
+                    if (defendingPlayer === 'player') {
+                        gameState.playerHP -= damage;
+                    } else {
+                        gameState.computerHP -= damage;
+                    }
+                    logMessage(`${targetCard.name} is destroyed. ${defendingPlayer.charAt(0).toUpperCase() + defendingPlayer.slice(1)} takes ${damage} damage.`, 'damage-action');
+                    defenderField.splice(defenderField.indexOf(targetCard), 1);
+                } else if (attackingCard.attack < targetCard.attack) {
+                    const damage = targetCard.attack - attackingCard.attack;
+                    if (attackingPlayer === 'player') {
+                        gameState.playerHP -= damage;
+                    } else {
+                        gameState.computerHP -= damage;
+                    }
+                    logMessage(`${attackingCard.name} is destroyed. ${attackingPlayer.charAt(0).toUpperCase() + attackingPlayer.slice(1)} takes ${damage} damage.`, 'damage-action');
                     attackerField.splice(attackerField.indexOf(attackingCard), 1);
-                    defenderField.splice(defenderField.indexOf(target), 1);
-                    logMessage(`Both cards are destroyed!`, 'battle-action');
+                } else { // Equal attack
+                    logMessage('Both monsters are destroyed in battle.', 'battle-action');
+                    attackerField.splice(attackerField.indexOf(attackingCard), 1);
+                    defenderField.splice(defenderField.indexOf(targetCard), 1);
+                }
+            } else { // Target is in defense position
+                if (attackingCard.attack > targetCard.defense) {
+                    logMessage(`${targetCard.name} is destroyed. No battle damage.`, 'battle-action');
+                    defenderField.splice(defenderField.indexOf(targetCard), 1);
+                } else if (attackingCard.attack < targetCard.defense) {
+                    const damage = targetCard.defense - attackingCard.attack;
+                    if (attackingPlayer === 'player') {
+                        gameState.playerHP -= damage;
+                    } else {
+                        gameState.computerHP -= damage;
+                    }
+                    logMessage(`${attackingCard.name} fails to destroy ${targetCard.name}. ${attackingPlayer.charAt(0).toUpperCase() + attackingPlayer.slice(1)} takes ${damage} damage.`, 'damage-action');
+                } else { // Equal attack and defense
+                    logMessage(`${targetCard.name} is not destroyed. No battle damage.`, 'battle-action');
                 }
             }
         }
 
         // End turn
         function endTurn() {
-            if (gameState.gamePhase !== 'end' || gameState.gameOver) return;
+            if ((gameState.gamePhase !== 'battle' && gameState.gamePhase !== 'end') || gameState.gameOver) return;
             
             gameState.currentTurn = 'computer';
             gameState.gamePhase = 'draw';
@@ -775,6 +834,7 @@
                         break;
                     case 'battle':
                         battleBtn.disabled = false;
+                        endBtn.disabled = false; // Allow skipping battle
                         break;
                     case 'end':
                         endBtn.disabled = false;
