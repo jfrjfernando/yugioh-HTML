@@ -1,0 +1,835 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yu-Gi-Oh Inspired Card Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header {
+            text-align: center;
+            border: 2px solid #000000;
+            padding: 10px;
+            margin-bottom: 20px;
+            background: #f0f0f0;
+        }
+
+        .game-board {
+            flex: 1;
+            display: grid;
+            grid-template-rows: auto 1fr auto;
+            gap: 20px;
+            border: 2px solid #000000;
+            padding: 20px;
+        }
+
+        .computer-zone, .player-zone {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hp-display {
+            font-size: 24px;
+            font-weight: bold;
+            padding: 10px 20px;
+            border: 2px solid #000000;
+            background: #f5f5f5;
+            min-width: 150px;
+            text-align: center;
+        }
+
+        .field-area {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            min-height: 120px;
+            border: 1px dashed #666666;
+            padding: 10px;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .card {
+            width: 100px;
+            height: 140px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            font-size: 10px;
+        }
+
+        .card:hover {
+            transform: scale(1.05);
+            background: #f8f8f8;
+        }
+
+        .card.selected {
+            background: #e0e0e0;
+            border-color: #333333;
+        }
+
+        .card.defense {
+            transform: rotate(90deg);
+        }
+
+        .card-name {
+            font-weight: bold;
+            text-align: center;
+            border-bottom: 1px solid #000000;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+        }
+
+        .card-stats {
+            text-align: center;
+            margin-top: auto;
+        }
+
+        .card-position {
+            font-size: 8px;
+            text-align: center;
+            margin: 2px 0;
+            font-weight: bold;
+        }
+
+        .hand-area {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            padding: 10px;
+            border: 1px solid #000000;
+            background: #f8f8f8;
+        }
+
+        .battle-field {
+            text-align: center;
+            padding: 20px;
+            border: 2px solid #000000;
+            background: #f0f0f0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 20px 0;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: 2px solid #000000;
+            background: #ffffff;
+            color: #000000;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .btn:hover {
+            background: #e0e0e0;
+        }
+
+        .btn:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+            color: #666666;
+        }
+
+        .turn-indicator {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            padding: 10px;
+            border: 1px solid #000000;
+            margin-bottom: 10px;
+        }
+
+        .history-section {
+            margin-top: 20px;
+            border: 2px solid #000000;
+            background: #f8f8f8;
+        }
+
+        .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            background: #e0e0e0;
+            border-bottom: 1px solid #000000;
+        }
+
+        .history-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+
+        .history-stats {
+            display: flex;
+            gap: 15px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .game-log {
+            height: 150px;
+            background: #ffffff;
+            padding: 10px;
+            overflow-y: auto;
+            font-size: 11px;
+        }
+
+        .log-entry {
+            padding: 3px 0;
+            border-bottom: 1px dotted #cccccc;
+            margin-bottom: 2px;
+        }
+
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+
+        .log-entry.turn-start {
+            font-weight: bold;
+            background: #f0f0f0;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        .log-entry.card-action {
+            color: #333333;
+            padding-left: 10px;
+        }
+
+        .log-entry.battle-action {
+            color: #000000;
+            font-weight: bold;
+            padding-left: 10px;
+        }
+
+        .log-entry.damage-action {
+            color: #444444;
+            font-weight: bold;
+            background: #f5f5f5;
+            padding: 3px 5px;
+        }
+
+        .log-entry.game-event {
+            font-weight: bold;
+            text-align: center;
+            background: #eeeeee;
+            padding: 5px;
+            margin: 5px 0;
+        }
+
+        .log-entry.welcome {
+            font-style: italic;
+            text-align: center;
+            color: #666666;
+        }
+
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: #ffffff;
+            border: 3px solid #000000;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+        }
+
+        .modal h2 {
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .computer-label {
+            background: #e0e0e0;
+            border: 1px solid #000000;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+
+        .player-label {
+            background: #d0d0d0;
+            border: 1px solid #000000;
+            padding: 5px 10px;
+            font-weight: bold;
+        }
+
+        @media (max-width: 768px) {
+            .game-container {
+                padding: 10px;
+            }
+            
+            .card {
+                width: 80px;
+                height: 112px;
+                font-size: 9px;
+            }
+            
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <div class="header">
+            <h1>YU-GI-OH INSPIRED CARD GAME</h1>
+        </div>
+
+        <div class="turn-indicator" id="turnIndicator">
+            PLAYER TURN - Draw your card!
+        </div>
+
+        <div class="game-board">
+            <!-- Computer Zone -->
+            <div class="computer-zone">
+                <div class="computer-label">COMPUTER</div>
+                <div class="hp-display" id="computerHP">HP: 8000</div>
+                <div class="field-area" id="computerField">
+                    <!-- Computer cards will appear here -->
+                </div>
+            </div>
+
+            <!-- Battle Field -->
+            <div class="battle-field" id="battleField">
+                BATTLE FIELD - Cards will fight here
+            </div>
+
+            <!-- Player Zone -->
+            <div class="player-zone">
+                <div class="player-label">PLAYER</div>
+                <div class="hp-display" id="playerHP">HP: 8000</div>
+                <div class="field-area" id="playerField">
+                    <!-- Player cards will appear here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Player Hand -->
+        <div class="hand-area" id="playerHand">
+            <!-- Player's current card will appear here -->
+        </div>
+
+        <div class="controls">
+            <button class="btn" id="drawCardBtn" onclick="drawCard()">DRAW CARD</button>
+            <button class="btn" id="attackPositionBtn" onclick="playCard('attack')" disabled>ATTACK POSITION</button>
+            <button class="btn" id="defensePositionBtn" onclick="playCard('defense')" disabled>DEFENSE POSITION</button>
+            <button class="btn" id="battleBtn" onclick="startBattle()" disabled>BATTLE PHASE</button>
+            <button class="btn" id="endTurnBtn" onclick="endTurn()" disabled>END TURN</button>
+        </div>
+
+        <div class="controls">
+            <button class="btn" onclick="resetGame()">NEW GAME</button>
+            <button class="btn" onclick="showRules()">RULES</button>
+            <button class="btn" onclick="clearHistory()">CLEAR HISTORY</button>
+        </div>
+
+        <div class="history-section">
+            <div class="history-header">
+                <h3>GAME HISTORY</h3>
+                <div class="history-stats">
+                    <span id="turnCounter">Turn: 1</span>
+                    <span id="actionCounter">Actions: 0</span>
+                </div>
+            </div>
+            <div class="game-log" id="gameLog">
+                <div class="log-entry welcome">Welcome to the Card Game! Click DRAW CARD to start.</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="modal" id="gameOverModal">
+        <div class="modal-content">
+            <h2 id="gameOverTitle">GAME OVER</h2>
+            <p id="gameOverMessage">You lost!</p>
+            <button class="btn" onclick="resetGame()">PLAY AGAIN</button>
+        </div>
+    </div>
+
+    <!-- Rules Modal -->
+    <div class="modal" id="rulesModal">
+        <div class="modal-content">
+            <h2>GAME RULES</h2>
+            <div style="text-align: left; margin: 20px 0;">
+                <p><strong>Objective:</strong> Reduce opponent's HP to 0</p>
+                <p><strong>Starting HP:</strong> 8000 each</p>
+                <p><strong>Turn Structure:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Draw 1 random card</li>
+                    <li>Choose Attack or Defense position</li>
+                    <li>Battle phase (if possible)</li>
+                    <li>End turn</li>
+                </ul>
+                <p><strong>Combat:</strong></p>
+                <ul style="margin-left: 20px;">
+                    <li>Attack Position: Use ATK value</li>
+                    <li>Defense Position: Use DEF value</li>
+                    <li>Higher value wins</li>
+                    <li>Equal values = both destroyed</li>
+                    <li>Direct attacks deal ATK damage to HP</li>
+                </ul>
+            </div>
+            <button class="btn" onclick="hideRules()">CLOSE</button>
+        </div>
+    </div>
+
+    <script>
+        // Card database
+        const cardDatabase = [
+            { name: "Dragon Knight", attack: 2500, defense: 1800 },
+            { name: "Fire Wizard", attack: 1800, defense: 1200 },
+            { name: "Steel Warrior", attack: 2000, defense: 2200 },
+            { name: "Shadow Beast", attack: 2200, defense: 1000 },
+            { name: "Light Guardian", attack: 1500, defense: 2500 },
+            { name: "Storm Eagle", attack: 1600, defense: 1400 },
+            { name: "Rock Golem", attack: 1200, defense: 2800 },
+            { name: "Swift Rogue", attack: 2100, defense: 800 },
+            { name: "Mystic Sage", attack: 1400, defense: 2000 },
+            { name: "Iron Titan", attack: 2800, defense: 2400 }
+        ];
+
+        // Game state
+        let gameState = {
+            playerHP: 8000,
+            computerHP: 8000,
+            playerField: [],
+            computerField: [],
+            playerHand: null,
+            currentTurn: 'player',
+            gamePhase: 'draw',
+            gameOver: false,
+            turnNumber: 1,
+            actionCount: 0
+        };
+
+        // Initialize game
+        function initGame() {
+            resetGame();
+            updateDisplay();
+        }
+
+        // Reset game
+        function resetGame() {
+            gameState = {
+                playerHP: 8000,
+                computerHP: 8000,
+                playerField: [],
+                computerField: [],
+                playerHand: null,
+                currentTurn: 'player',
+                gamePhase: 'draw',
+                gameOver: false,
+                turnNumber: 1,
+                actionCount: 0
+            };
+            clearHistory();
+            updateDisplay();
+            hideModal('gameOverModal');
+            hideModal('rulesModal');
+            logMessage("NEW GAME STARTED! Player goes first.", 'game-event');
+        }
+
+        // Draw random card
+        function drawCard() {
+            if (gameState.gamePhase !== 'draw' || gameState.gameOver) return;
+
+            const randomCard = cardDatabase[Math.floor(Math.random() * cardDatabase.length)];
+            
+            if (gameState.currentTurn === 'player') {
+                logMessage(`=== TURN ${gameState.turnNumber} - PLAYER ===`, 'turn-start');
+                gameState.playerHand = { ...randomCard, id: Date.now() };
+                logMessage(`Player drew: ${randomCard.name} (ATK:${randomCard.attack} DEF:${randomCard.defense})`, 'card-action');
+                gameState.gamePhase = 'main';
+            } else {
+                // Computer draws and immediately plays
+                logMessage(`=== TURN ${gameState.turnNumber} - COMPUTER ===`, 'turn-start');
+                gameState.playerHand = null;
+                computerTurn(randomCard);
+            }
+            
+            updateDisplay();
+        }
+
+        // Play card in attack or defense position
+        function playCard(position) {
+            if (!gameState.playerHand || gameState.gamePhase !== 'main' || gameState.gameOver) return;
+
+            const card = { ...gameState.playerHand, position: position };
+            gameState.playerField.push(card);
+            gameState.playerHand = null;
+            gameState.gamePhase = 'battle';
+            
+            logMessage(`Player played ${card.name} in ${position.toUpperCase()} position (ATK:${card.attack} DEF:${card.defense})`, 'card-action');
+            updateDisplay();
+        }
+
+        // Computer turn AI
+        function computerTurn(drawnCard) {
+            const position = drawnCard.defense > drawnCard.attack ? 'defense' : 'attack';
+            const card = { ...drawnCard, position: position, id: Date.now() };
+            gameState.computerField.push(card);
+            
+            logMessage(`Computer drew: ${card.name} (ATK:${card.attack} DEF:${card.defense})`, 'card-action');
+            logMessage(`Computer played ${card.name} in ${position.toUpperCase()} position`, 'card-action');
+            
+            // Computer battle phase
+            setTimeout(() => {
+                computerBattle();
+            }, 1000);
+        }
+
+        // Start battle phase
+        function startBattle() {
+            if (gameState.gamePhase !== 'battle' || gameState.gameOver) return;
+            
+            playerBattle();
+        }
+
+        // Player battle logic
+        function playerBattle() {
+            if (gameState.computerField.length === 0) {
+                // Direct attack
+                if (gameState.playerField.length > 0) {
+                    const attackingCard = gameState.playerField.find(card => card.position === 'attack');
+                    if (attackingCard) {
+                        gameState.computerHP -= attackingCard.attack;
+                        logMessage(`${attackingCard.name} attacks directly!`, 'battle-action');
+                        logMessage(`Computer loses ${attackingCard.attack} HP! (${gameState.computerHP} HP remaining)`, 'damage-action');
+                    }
+                }
+            } else {
+                // Battle with computer's cards
+                battleCards('player');
+            }
+            
+            gameState.gamePhase = 'end';
+            updateDisplay();
+            
+            if (gameState.computerHP <= 0) {
+                endGame('player');
+                return;
+            }
+        }
+
+        // Computer battle logic
+        function computerBattle() {
+            if (gameState.playerField.length === 0) {
+                // Direct attack
+                const attackingCard = gameState.computerField.find(card => card.position === 'attack');
+                if (attackingCard) {
+                    gameState.playerHP -= attackingCard.attack;
+                    logMessage(`Computer's ${attackingCard.name} attacks directly!`, 'battle-action');
+                    logMessage(`Player loses ${attackingCard.attack} HP! (${gameState.playerHP} HP remaining)`, 'damage-action');
+                }
+            } else {
+                // Battle with player's cards
+                battleCards('computer');
+            }
+            
+            if (gameState.playerHP <= 0) {
+                endGame('computer');
+                return;
+            }
+            
+            // End computer turn
+            gameState.currentTurn = 'player';
+            gameState.gamePhase = 'draw';
+            gameState.turnNumber++;
+            updateDisplay();
+        }
+
+        // Battle between cards
+        function battleCards(attacker) {
+            const attackerField = attacker === 'player' ? gameState.playerField : gameState.computerField;
+            const defenderField = attacker === 'player' ? gameState.computerField : gameState.playerField;
+            
+            const attackingCard = attackerField.find(card => card.position === 'attack');
+            if (!attackingCard) return;
+            
+            // Find target (weakest defending card that can be defeated, or same attack for mutual destruction)
+            let target = null;
+            
+            for (let card of defenderField) {
+                const defenderValue = card.position === 'attack' ? card.attack : card.defense;
+                const attackerValue = attackingCard.attack;
+                
+                if (attackerValue > defenderValue) {
+                    if (!target || defenderValue > (target.position === 'attack' ? target.attack : target.defense)) {
+                        target = card;
+                    }
+                } else if (attackerValue === defenderValue) {
+                    target = card;
+                    break; // Prefer equal attack for mutual destruction
+                }
+            }
+            
+            if (target) {
+                const defenderValue = target.position === 'attack' ? target.attack : target.defense;
+                const attackerValue = attackingCard.attack;
+                
+                logMessage(`${attackingCard.name} (${attackerValue}) attacks ${target.name} (${defenderValue})`, 'battle-action');
+                
+                if (attackerValue > defenderValue) {
+                    // Attacker wins
+                    defenderField.splice(defenderField.indexOf(target), 1);
+                    logMessage(`${target.name} is destroyed!`, 'battle-action');
+                } else if (attackerValue === defenderValue) {
+                    // Mutual destruction
+                    attackerField.splice(attackerField.indexOf(attackingCard), 1);
+                    defenderField.splice(defenderField.indexOf(target), 1);
+                    logMessage(`Both cards are destroyed!`, 'battle-action');
+                }
+            }
+        }
+
+        // End turn
+        function endTurn() {
+            if (gameState.gamePhase !== 'end' || gameState.gameOver) return;
+            
+            gameState.currentTurn = 'computer';
+            gameState.gamePhase = 'draw';
+            gameState.turnNumber++;
+            
+            logMessage("Player ends turn.", 'turn-start');
+            updateDisplay();
+            
+            // Computer draws after a short delay
+            setTimeout(() => {
+                drawCard();
+            }, 1000);
+        }
+
+        // End game
+        function endGame(winner) {
+            gameState.gameOver = true;
+            const modal = document.getElementById('gameOverModal');
+            const title = document.getElementById('gameOverTitle');
+            const message = document.getElementById('gameOverMessage');
+            
+            if (winner === 'player') {
+                title.textContent = 'VICTORY!';
+                message.textContent = `Congratulations! You defeated the computer!`;
+                logMessage("GAME OVER - PLAYER WINS!", 'game-event');
+            } else {
+                title.textContent = 'DEFEAT!';
+                message.textContent = `The computer has defeated you!`;
+                logMessage("GAME OVER - COMPUTER WINS!", 'game-event');
+            }
+            
+            showModal('gameOverModal');
+        }
+
+        // Update display
+        function updateDisplay() {
+            // Update HP
+            document.getElementById('playerHP').textContent = `HP: ${gameState.playerHP}`;
+            document.getElementById('computerHP').textContent = `HP: ${gameState.computerHP}`;
+            
+            // Update turn indicator
+            const turnText = gameState.currentTurn === 'player' ? 
+                `PLAYER TURN - ${getPhaseText()}` : 
+                `COMPUTER TURN - ${getPhaseText()}`;
+            document.getElementById('turnIndicator').textContent = turnText;
+            
+            // Update hand
+            updateHand();
+            
+            // Update fields
+            updateField('playerField', gameState.playerField);
+            updateField('computerField', gameState.computerField);
+            
+            // Update buttons
+            updateButtons();
+            
+            // Update history stats
+            updateHistoryStats();
+        }
+
+        function getPhaseText() {
+            switch(gameState.gamePhase) {
+                case 'draw': return 'Draw Phase';
+                case 'main': return 'Main Phase';
+                case 'battle': return 'Battle Phase';
+                case 'end': return 'End Phase';
+                default: return '';
+            }
+        }
+
+        function updateHand() {
+            const handElement = document.getElementById('playerHand');
+            handElement.innerHTML = '';
+            
+            if (gameState.playerHand) {
+                const cardElement = createCardElement(gameState.playerHand, 'hand');
+                handElement.appendChild(cardElement);
+            }
+        }
+
+        function updateField(fieldId, cards) {
+            const fieldElement = document.getElementById(fieldId);
+            fieldElement.innerHTML = '';
+            
+            cards.forEach(card => {
+                const cardElement = createCardElement(card, 'field');
+                fieldElement.appendChild(cardElement);
+            });
+            
+            if (cards.length === 0) {
+                fieldElement.innerHTML = '<div style="color: #666; font-style: italic;">No cards</div>';
+            }
+        }
+
+        function createCardElement(card, location) {
+            const cardDiv = document.createElement('div');
+            cardDiv.className = `card ${card.position === 'defense' ? 'defense' : ''}`;
+            cardDiv.innerHTML = `
+                <div class="card-name">${card.name}</div>
+                <div class="card-position">${card.position ? card.position.toUpperCase() : ''}</div>
+                <div class="card-stats">
+                    ATK: ${card.attack}<br>
+                    DEF: ${card.defense}
+                </div>
+            `;
+            return cardDiv;
+        }
+
+        function updateButtons() {
+            const drawBtn = document.getElementById('drawCardBtn');
+            const attackBtn = document.getElementById('attackPositionBtn');
+            const defenseBtn = document.getElementById('defensePositionBtn');
+            const battleBtn = document.getElementById('battleBtn');
+            const endBtn = document.getElementById('endTurnBtn');
+            
+            // Reset all buttons
+            [drawBtn, attackBtn, defenseBtn, battleBtn, endBtn].forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            if (gameState.gameOver) return;
+            
+            if (gameState.currentTurn === 'player') {
+                switch(gameState.gamePhase) {
+                    case 'draw':
+                        drawBtn.disabled = false;
+                        break;
+                    case 'main':
+                        if (gameState.playerHand) {
+                            attackBtn.disabled = false;
+                            defenseBtn.disabled = false;
+                        }
+                        break;
+                    case 'battle':
+                        battleBtn.disabled = false;
+                        break;
+                    case 'end':
+                        endBtn.disabled = false;
+                        break;
+                }
+            }
+        }
+
+        // Utility functions
+        function showModal(modalId) {
+            document.getElementById(modalId).style.display = 'flex';
+        }
+
+        function hideModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        function showRules() {
+            showModal('rulesModal');
+        }
+
+        function hideRules() {
+            hideModal('rulesModal');
+        }
+
+        function logMessage(message, type = '') {
+            const log = document.getElementById('gameLog');
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${type}`;
+            logEntry.innerHTML = `[${timestamp}] ${message}`;
+            log.appendChild(logEntry);
+            log.scrollTop = log.scrollHeight;
+            
+            // Update action counter
+            if (type !== 'welcome' && type !== 'game-event') {
+                gameState.actionCount++;
+                updateHistoryStats();
+            }
+        }
+
+        function clearHistory() {
+            const log = document.getElementById('gameLog');
+            log.innerHTML = '<div class="log-entry welcome">Game history cleared. Ready for action!</div>';
+            gameState.actionCount = 0;
+            updateHistoryStats();
+        }
+
+        function updateHistoryStats() {
+            document.getElementById('turnCounter').textContent = `Turn: ${gameState.turnNumber}`;
+            document.getElementById('actionCounter').textContent = `Actions: ${gameState.actionCount}`;
+        }
+
+        // Initialize game when page loads
+        window.addEventListener('load', initGame);
+    </script>
+</body>
+</html>
