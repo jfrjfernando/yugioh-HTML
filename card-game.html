@@ -402,6 +402,7 @@
                 <button class="btn" id="drawCardBtn" onclick="drawCard()">DRAW CARD</button>
                 <button class="btn" id="attackPositionBtn" onclick="playCard('attack')" disabled>ATTACK</button>
                 <button class="btn" id="defensePositionBtn" onclick="playCard('defense')" disabled>DEFENSE</button>
+                <button class="btn" id="activateEffectBtn" onclick="activateEffect()" disabled>ACTIVATE EFFECT</button>
                 <button class="btn" id="battleBtn" onclick="startBattle()" disabled>BATTLE</button>
                 <button class="btn" id="endTurnBtn" onclick="endTurn()" disabled>END TURN</button>
             </div>
@@ -467,16 +468,22 @@
     <script>
         // Card database
         const cardDatabase = [
-            { name: "Dragon Knight", attack: 2500, defense: 1800 },
-            { name: "Fire Wizard", attack: 1800, defense: 1200 },
-            { name: "Steel Warrior", attack: 2000, defense: 2200 },
-            { name: "Shadow Beast", attack: 2200, defense: 1000 },
-            { name: "Light Guardian", attack: 1500, defense: 2500 },
-            { name: "Storm Eagle", attack: 1600, defense: 1400 },
-            { name: "Rock Golem", attack: 1200, defense: 2800 },
-            { name: "Swift Rogue", attack: 2100, defense: 800 },
-            { name: "Mystic Sage", attack: 1400, defense: 2000 },
-            { name: "Iron Titan", attack: 2800, defense: 2400 }
+            // Monster Cards
+            { name: "Dragon Knight", type: "monster", attack: 2500, defense: 1800 },
+            { name: "Fire Wizard", type: "monster", attack: 1800, defense: 1200 },
+            { name: "Steel Warrior", type: "monster", attack: 2000, defense: 2200 },
+            { name: "Shadow Beast", type: "monster", attack: 2200, defense: 1000 },
+            { name: "Light Guardian", type: "monster", attack: 1500, defense: 2500 },
+            { name: "Storm Eagle", type: "monster", attack: 1600, defense: 1400 },
+            { name: "Rock Golem", type: "monster", attack: 1200, defense: 2800 },
+            { name: "Swift Rogue", type: "monster", attack: 2100, defense: 800 },
+            { name: "Mystic Sage", type: "monster", attack: 1400, defense: 2000 },
+            { name: "Iron Titan", type: "monster", attack: 2800, defense: 2400 },
+            // Effect Cards
+            { name: "Dark Pact", type: "effect", effect: "computer-loses-1000", description: "Computer loses 1000 HP." },
+            { name: "Healing Light", type: "effect", effect: "player-gains-1000", description: "Player gains 1000 HP." },
+            { name: "Life Drain", type: "effect", effect: "player-loses-1000", description: "Player loses 1000 HP." },
+            { name: "Computer's Blessing", type: "effect", effect: "computer-gains-1000", description: "Computer gains 1000 HP." }
         ];
 
         // Game state
@@ -554,19 +561,92 @@
             updateDisplay();
         }
 
+        // Activate effect card
+        function activateEffect() {
+            if (!gameState.playerHand || gameState.gamePhase !== 'main' || gameState.gameOver || gameState.playerHand.type !== 'effect') return;
+
+            const card = gameState.playerHand;
+            logMessage(`Player activates effect: ${card.name} - ${card.description}`, 'card-action');
+
+            switch (card.effect) {
+                case 'computer-loses-1000':
+                    gameState.computerHP -= 1000;
+                    logMessage(`Computer loses 1000 HP. (${gameState.computerHP} HP remaining)`, 'damage-action');
+                    break;
+                case 'player-gains-1000':
+                    gameState.playerHP += 1000;
+                    logMessage(`Player gains 1000 HP. (${gameState.playerHP} HP remaining)`, 'game-event');
+                    break;
+                case 'player-loses-1000':
+                    gameState.playerHP -= 1000;
+                    logMessage(`Player loses 1000 HP. (${gameState.playerHP} HP remaining)`, 'damage-action');
+                    break;
+                case 'computer-gains-1000':
+                    gameState.computerHP += 1000;
+                    logMessage(`Computer gains 1000 HP. (${gameState.computerHP} HP remaining)`, 'game-event');
+                    break;
+            }
+
+            gameState.playerHand = null;
+            gameState.gamePhase = 'battle';
+            updateDisplay();
+
+            if (gameState.playerHP <= 0) {
+                endGame('computer');
+            } else if (gameState.computerHP <= 0) {
+                endGame('player');
+            }
+        }
+
         // Computer turn AI
         function computerTurn(drawnCard) {
-            const position = drawnCard.defense > drawnCard.attack ? 'defense' : 'attack';
-            const card = { ...drawnCard, position: position, id: Date.now() };
-            gameState.computerField.push(card);
-            
-            logMessage(`Computer drew: ${card.name} (ATK:${card.attack} DEF:${card.defense})`, 'card-action');
-            logMessage(`Computer played ${card.name} in ${position.toUpperCase()} position`, 'card-action');
-            
-            // Computer battle phase
-            setTimeout(() => {
-                computerBattle();
-            }, 1000);
+            if (drawnCard.type === 'effect') {
+                logMessage(`Computer drew effect card: ${drawnCard.name}`, 'card-action');
+                logMessage(`Computer activates effect: ${drawnCard.name} - ${drawnCard.description}`, 'card-action');
+
+                switch (drawnCard.effect) {
+                    case 'computer-loses-1000':
+                        gameState.computerHP -= 1000;
+                        logMessage(`Computer loses 1000 HP. (${gameState.computerHP} HP remaining)`, 'damage-action');
+                        break;
+                    case 'player-gains-1000':
+                        gameState.playerHP += 1000;
+                        logMessage(`Player gains 1000 HP. (${gameState.playerHP} HP remaining)`, 'game-event');
+                        break;
+                    case 'player-loses-1000':
+                        gameState.playerHP -= 1000;
+                        logMessage(`Player loses 1000 HP. (${gameState.playerHP} HP remaining)`, 'damage-action');
+                        break;
+                    case 'computer-gains-1000':
+                        gameState.computerHP += 1000;
+                        logMessage(`Computer gains 1000 HP. (${gameState.computerHP} HP remaining)`, 'game-event');
+                        break;
+                }
+
+                if (gameState.playerHP <= 0) {
+                    endGame('computer');
+                    return;
+                } else if (gameState.computerHP <= 0) {
+                    endGame('player');
+                    return;
+                }
+
+                setTimeout(() => {
+                    computerBattle();
+                }, 1000);
+
+            } else { // It's a monster card
+                const position = drawnCard.defense > drawnCard.attack ? 'defense' : 'attack';
+                const card = { ...drawnCard, position: position, id: Date.now() };
+                gameState.computerField.push(card);
+
+                logMessage(`Computer drew: ${card.name} (ATK:${card.attack} DEF:${card.defense})`, 'card-action');
+                logMessage(`Computer played ${card.name} in ${position.toUpperCase()} position`, 'card-action');
+
+                setTimeout(() => {
+                    computerBattle();
+                }, 1000);
+            }
         }
 
         // Start battle phase
@@ -796,14 +876,25 @@
         function createCardElement(card, location) {
             const cardDiv = document.createElement('div');
             cardDiv.className = `card ${card.position === 'defense' ? 'defense' : ''}`;
-            cardDiv.innerHTML = `
-                <div class="card-name">${card.name}</div>
-                <div class="card-position">${card.position ? card.position.toUpperCase() : ''}</div>
-                <div class="card-stats">
-                    ATK: ${card.attack}<br>
-                    DEF: ${card.defense}
-                </div>
-            `;
+
+            if (card.type === 'effect') {
+                cardDiv.innerHTML = `
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-position">EFFECT</div>
+                    <div class="card-stats">
+                        ${card.description}
+                    </div>
+                `;
+            } else { // Monster card
+                cardDiv.innerHTML = `
+                    <div class="card-name">${card.name}</div>
+                    <div class="card-position">${card.position ? card.position.toUpperCase() : ''}</div>
+                    <div class="card-stats">
+                        ATK: ${card.attack}<br>
+                        DEF: ${card.defense}
+                    </div>
+                `;
+            }
             return cardDiv;
         }
 
@@ -811,11 +902,12 @@
             const drawBtn = document.getElementById('drawCardBtn');
             const attackBtn = document.getElementById('attackPositionBtn');
             const defenseBtn = document.getElementById('defensePositionBtn');
+            const activateEffectBtn = document.getElementById('activateEffectBtn');
             const battleBtn = document.getElementById('battleBtn');
             const endBtn = document.getElementById('endTurnBtn');
             
             // Reset all buttons
-            [drawBtn, attackBtn, defenseBtn, battleBtn, endBtn].forEach(btn => {
+            [drawBtn, attackBtn, defenseBtn, activateEffectBtn, battleBtn, endBtn].forEach(btn => {
                 btn.disabled = true;
             });
             
@@ -828,8 +920,12 @@
                         break;
                     case 'main':
                         if (gameState.playerHand) {
-                            attackBtn.disabled = false;
-                            defenseBtn.disabled = false;
+                            if (gameState.playerHand.type === 'monster') {
+                                attackBtn.disabled = false;
+                                defenseBtn.disabled = false;
+                            } else if (gameState.playerHand.type === 'effect') {
+                                activateEffectBtn.disabled = false;
+                            }
                         }
                         break;
                     case 'battle':
